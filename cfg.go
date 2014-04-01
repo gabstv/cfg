@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func ParseFile(path string) (map[string]string, error) {
@@ -68,7 +69,7 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 				if i == len(a)-1 && a[i] == '\\' {
 					varVal.WriteRune('\n')
 					continue
-				} else if i == len(a) {
+				} else if i == len(a)-1 {
 					insideVar = false
 				}
 				//TODO: parse "\" better
@@ -77,7 +78,7 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 		}
 		lc++
 		if !insideVar {
-			mp[varName.String()] = varVal.String()
+			mp[strings.TrimSpace(varName.String())] = strings.TrimSpace(varVal.String())
 		}
 	}
 	return mp, nil

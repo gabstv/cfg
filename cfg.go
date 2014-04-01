@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strconv"
 )
 
 func ParseFile(path string) (map[string]string, error) {
@@ -18,7 +19,7 @@ func ParseFile(path string) (map[string]string, error) {
 		return nil, err
 	}
 	defer fl.Close()
-	_, err = io.Copy(&buffer, src)
+	_, err = io.Copy(&buffer, fl)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 	lc := 0
 	mp := make(map[string]string, 0)
 	for l, e := b.ReadString('\n'); e == nil; {
-		a := []rune(s)
+		a := []rune(l)
 		if a[0] == '#' && !insideVar {
 			continue
 		}
@@ -55,11 +56,11 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 				switch a[i] {
 				case '=':
 					if varName.Len() < 1 {
-						return nil, errors.New("Syntax error at line " + strconv.Itoa() + " (" + strconv.Itoa(lc) + "): " + l)
+						return nil, errors.New("Syntax error at line " + strconv.Itoa(lc) + " (" + strconv.Itoa(i) + "): " + l)
 					}
 					insideVar = true
 				case '\\', '\'', '"', '#', '^', '&':
-					return nil, errors.New("Syntax error at line " + strconv.Itoa() + " (" + strconv.Itoa(lc) + "): " + l)
+					return nil, errors.New("Syntax error at line " + strconv.Itoa(lc) + " (" + strconv.Itoa(i) + "): " + l)
 				default:
 					varName.WriteRune(a[i])
 				}

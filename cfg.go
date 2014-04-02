@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
+	//"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -53,18 +53,18 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 		if e != nil {
 			break
 		} else {
-			fmt.Println("!RIOT! ", l)
+			//fmt.Println("!RIOT! ", l)
 			a := []rune(l)
 			if a[0] == '#' && !insideVar {
 				continue
 			}
 			for i := 0; i < len(a); i++ {
-				fmt.Printf(" %s (%v) ", string(a[i]), lc)
+				//fmt.Printf(" %s (%v) ", string(a[i]), lc)
 				if !insideVar {
 					fmt.Print(insideVar, " ")
 					switch a[i] {
 					case '=':
-						fmt.Print(" is '=' ")
+						//fmt.Print(" is '=' ")
 						if varName.Len() < 1 {
 							return nil, errors.New("Syntax error at line " + strconv.Itoa(lc) + " (" + strconv.Itoa(i) + "): " + l)
 						}
@@ -75,13 +75,13 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 						varName.WriteRune(a[i])
 					}
 				} else {
-					fmt.Print(insideVar)
+					//fmt.Print(insideVar)
 					if i == len(a)-1 && a[i] == '\\' {
 						varVal.WriteRune('\n')
-						fmt.Print("\n")
+						//fmt.Print("\n")
 						continue
 					} else if i == len(a)-1 {
-						fmt.Print("inside var will be cause because EOL\n")
+						//fmt.Print("inside var will be cause because EOL\n")
 						insideVar = false
 						break
 					}
@@ -93,7 +93,7 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 			if !insideVar {
 				v00 := varName.String()
 				v01 := varVal.String()
-				fmt.Println("v00", v00, "v01", v01)
+				//fmt.Println("v00", v00, "v01", v01)
 				mp[strings.TrimSpace(v00)] = strings.TrimSpace(v01)
 				varName.Truncate(0)
 				varVal.Truncate(0)

@@ -61,7 +61,7 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 			for i := 0; i < len(a); i++ {
 				//fmt.Printf(" %s (%v) ", string(a[i]), lc)
 				if !insideVar {
-					fmt.Print(insideVar, " ")
+					//fmt.Print(insideVar, " ")
 					switch a[i] {
 					case '=':
 						//fmt.Print(" is '=' ")

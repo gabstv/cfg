@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	//"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -42,6 +41,8 @@ func ParseString(val string) (map[string]string, error) {
 }
 
 func parse(buf *bytes.Buffer) (map[string]string, error) {
+	convnl(buf, buf)
+	buf.WriteRune('\n')
 	insideVar := false
 	var varName bytes.Buffer
 	var varVal bytes.Buffer
@@ -53,18 +54,14 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 		if e != nil {
 			break
 		} else {
-			//fmt.Println("!RIOT! ", l)
 			a := []rune(l)
 			if a[0] == '#' && !insideVar {
 				continue
 			}
 			for i := 0; i < len(a); i++ {
-				//fmt.Printf(" %s (%v) ", string(a[i]), lc)
 				if !insideVar {
-					//fmt.Print(insideVar, " ")
 					switch a[i] {
 					case '=':
-						//fmt.Print(" is '=' ")
 						if varName.Len() < 1 {
 							return nil, errors.New("Syntax error at line " + strconv.Itoa(lc) + " (" + strconv.Itoa(i) + "): " + l)
 						}
@@ -75,18 +72,27 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 						varName.WriteRune(a[i])
 					}
 				} else {
-					//fmt.Print(insideVar)
-					if i == len(a)-1 && a[i] == '\\' {
-						varVal.WriteRune('\n')
-						//fmt.Print("\n")
-						continue
-					} else if i == len(a)-1 {
-						//fmt.Print("inside var will be cause because EOL\n")
+					if i == len(a)-1 {
+						// last char is always a \n
 						insideVar = false
-						break
+						if i > 0 {
+							if a[i-1] == '\\' {
+								varVal.WriteRune('\n')
+								insideVar = true
+							}
+						}
+						continue
 					}
 					//TODO: parse "\" better
-					varVal.WriteRune(a[i])
+					if a[i] == '\\' {
+						if i > 0 {
+							if a[i-1] == '\\' {
+								varVal.WriteRune(a[i])
+							}
+						}
+					} else {
+						varVal.WriteRune(a[i])
+					}
 				}
 			}
 			lc++
@@ -102,4 +108,32 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 
 	}
 	return mp, nil
+}
+
+func convnl(input io.Reader, output io.Writer) {
+	r := bufio.NewReader(input)
+	w := bufio.NewWriter(output)
+	var prev rune
+	for {
+		cur, _, err := r.ReadRune()
+		if err != nil {
+			if prev == '\r' {
+				w.WriteRune(prev)
+			}
+			break
+		}
+		if cur == '\r' {
+			if prev == '\r' {
+				w.WriteRune(prev)
+			}
+			prev = cur
+			continue
+		}
+		if cur != '\n' && prev == '\r' {
+			w.WriteRune(prev)
+		}
+		prev = cur
+		w.WriteRune(cur)
+	}
+	w.Flush()
 }

@@ -10,6 +10,37 @@ import (
 	"strings"
 )
 
+func StringSlice(str string, split ...string) []string {
+	sp := ","
+	if len(split) > 0 {
+		sp = split[0]
+	}
+	out := strings.Split(str, sp)
+	for k, v := range out {
+		out[k] = strings.TrimSpace(v)
+	}
+	return out
+}
+
+func IntSlice(str string, split ...string) ([]int, error) {
+	var err error
+	sp := ","
+	if len(split) > 0 {
+		sp = split[0]
+	}
+	temp := strings.Split(str, sp)
+	out := make([]int, len(temp))
+	for k, v := range temp {
+		v = strings.TrimSpace(v)
+		out[k], err = strconv.Atoi(v)
+		if err != nil {
+			break
+		}
+	}
+
+	return out, err
+}
+
 func ParseFile(path string) (map[string]string, error) {
 	var buffer bytes.Buffer
 	if _, err := os.Stat(path); err != nil {

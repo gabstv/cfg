@@ -131,7 +131,7 @@ func parse(buf *bytes.Buffer) (map[string]string, error) {
 				v00 := varName.String()
 				v01 := varVal.String()
 				//fmt.Println("v00", v00, "v01", v01)
-				mp[strings.TrimSpace(v00)] = strings.TrimSpace(v01)
+				mp[strings.TrimSpace(v00)] = strings.Trim(v01, " ")
 				varName.Truncate(0)
 				varVal.Truncate(0)
 			}

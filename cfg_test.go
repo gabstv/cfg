@@ -1,6 +1,7 @@
 package cfg
 
 import (
+	"os"
 	"testing"
 )
 
@@ -48,4 +49,16 @@ Acesse este link %v para cadastrar uma senha.
 
 (este acesso expira em 24h)`)
 	}
+}
+
+func TestConfigFile(t *testing.T) {
+	fl := os.Getenv("TP")
+	if len(fl) < 1 {
+		return
+	}
+	CFG_MAIN, err := ParseFile(fl)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	t.Log(CFG_MAIN)
 }

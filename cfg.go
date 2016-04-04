@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -72,7 +73,9 @@ func ParseString(val string) (map[string]string, error) {
 }
 
 func parse(buf *bytes.Buffer) (map[string]string, error) {
-	convnl(buf, buf)
+	b2 := new(bytes.Buffer)
+	convnl(buf, b2)
+	buf = b2
 	buf.WriteRune('\n')
 	insideVar := false
 	var varName bytes.Buffer
@@ -147,6 +150,7 @@ func convnl(input io.Reader, output io.Writer) {
 	var prev rune
 	for {
 		cur, _, err := r.ReadRune()
+		fmt.Print(string(cur))
 		if err != nil {
 			if prev == '\r' {
 				w.WriteRune(prev)

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -150,7 +149,6 @@ func convnl(input io.Reader, output io.Writer) {
 	var prev rune
 	for {
 		cur, _, err := r.ReadRune()
-		fmt.Print(string(cur))
 		if err != nil {
 			if prev == '\r' {
 				w.WriteRune(prev)
